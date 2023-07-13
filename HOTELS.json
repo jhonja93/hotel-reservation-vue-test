@@ -1,0 +1,29 @@
+[
+    {
+        "id": 1,
+        "name": "Lakewood",
+        "rating": 3,
+        "weekday_regular_price": 110,
+        "weekday_rewards_price": 80,
+        "weekend_regular_price": 90,
+        "weekend_rewards_price": 80
+    },
+    {
+        "id": 2,
+        "name": "Bridgewood",
+        "rating": 4,
+        "weekday_regular_price": 160,
+        "weekday_rewards_price": 110,
+        "weekend_regular_price": 60,
+        "weekend_rewards_price": 50
+    },
+    {
+        "id": 3,
+        "name": "Ridgewood",
+        "rating": 5,
+        "weekday_regular_price": 220,
+        "weekday_rewards_price": 100,
+        "weekend_regular_price": 150,
+        "weekend_rewards_price": 40
+    }
+]
