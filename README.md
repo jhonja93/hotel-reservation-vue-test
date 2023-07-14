@@ -1,14 +1,10 @@
 # hotel-reservation
 
-This is the solution 
+This is the solution to the Tipti test for the position of Fron-end developer.
 
-## Recommended IDE Setup
+## Description
+For this solution we develop a SPA with Vue 3, we use a json file with random data as a database called HOTELS.json (feel free to insert more data).
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
 
 ## Project Setup
 
