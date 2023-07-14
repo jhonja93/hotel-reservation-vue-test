@@ -1,4 +1,5 @@
 <script setup>
+import HotelCard from './components/HotelCard.vue'
 import HOTELS from './../HOTELS.json'
 import { ref, computed } from 'vue'
 
@@ -36,7 +37,7 @@ const numNights = computed(() => {
     const end = new Date(endDate.value)
     const timeDifference = Math.abs(end.getTime() - start.getTime())
     const numDays = Math.ceil(timeDifference / (1000 * 3600 * 24)) // Calculate the number of days rounding up
-    return numDays;
+    return numDays
   } else {
     return 0
   }
@@ -73,6 +74,12 @@ const handleStartDate = () => {
 }
 
 const handleSubmit = () => {
+
+  hotels.value = hotels.value.map((hotel) => {
+    hotel.showBestPriceTag = false
+    return hotel
+  })
+  
   const data = {
     startDate: startDate.value,
     endDate: endDate.value,
@@ -97,12 +104,12 @@ const calculateTotalPrice = (hotel, data) => {
   const { customerType } = data
   let totalPrice = 0
 
-  for (let i=0; i < numWeekdayNights.value; i++) {
+  for (let i = 0; i < numWeekdayNights.value; i++) {
     totalPrice +=
       customerType === 'Regular' ? hotel.weekday_regular_price : hotel.weekday_rewards_price
   }
 
-  for (let i=0; i < numWeekendNights.value; i++) {
+  for (let i = 0; i < numWeekendNights.value; i++) {
     totalPrice +=
       customerType === 'Regular' ? hotel.weekend_regular_price : hotel.weekend_rewards_price
   }
@@ -157,53 +164,132 @@ const calculateTotalPrice = (hotel, data) => {
     </form>
     <hr style="opacity: 0.3" />
     <article class="hotels">
-      <section class="hotel__card" v-for="hotel in hotels" :key="hotel.id">
-        <p class="hotel__card__title">{{ hotel.name }} <span id="best-price-tag" v-if="hotel.showBestPriceTag">Best Price</span></p>
-        <div class="hotel__card__details">
-          <!-- <span>Prices:</span> -->
-          <span v-for="star in hotel.rating" :key="star">{{ '⭐️' }}</span>
-          <hr style="opacity: 0.3; margin: 12px 0" />
-          <p>
-            <span>Weekday:</span><br />Regular ${{ hotel.weekday_regular_price }} | Rewards: ${{
-              hotel.weekday_rewards_price
-            }}
-          </p>
-          <p>
-            <span>Weekend:</span><br />Regular ${{ hotel.weekend_regular_price }} | Rewards: ${{
-              hotel.weekend_rewards_price
-            }}
-          </p>
-        </div>
-      </section>
+      <HotelCard v-for="hotel in hotels" :key="hotel.id" :hotel="hotel" />
     </article>
   </div>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
+.hotels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+.search-input {
+  background-color: #e3bd2d;
+  display: flex;
+  border-radius: 5px;
+  justify-content: space-between;
+  margin: 6px 0 3px;
+  padding: 3px;
 }
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
+.search-input > div {
+  background-color: #fff;
+  border-radius: 5px;
+  box-sizing: border-box;
+  display: flex;
+  flex-grow: 2;
+  margin-left: 3px;
+}
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
+.search-input > div:nth-child(2) {
+  flex-direction: column;
+  min-width: 150px;
+  text-align: center;
+  justify-content: center;
+}
 
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+button.search {
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 28px;
+  padding: 1px 6px;
+  width: 100%;
+  border: 0;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--vt-c-indigo);
+  color: #fff;
+  border-radius: 5px;
+}
+
+#dates-container {
+  display: flex;
+  justify-content: space-around;
+  padding: 3px 6px;
+  flex: 1 1 auto;
+  margin-left: 0px;
+  align-items: center;
+  border: 2px solid var(--vt-c-indigo);
+}
+
+#dates-container label {
+  word-break: break-word;
+}
+
+#dates-container input {
+  width: 250px;
+  margin: 0 10px;
+}
+
+#dates-container input[type='date'] {
+  background-color: var(--vt-c-indigo);
+  padding: 10px;
+  color: #ffffff;
+  font-family: 'Roboto Mono', monospace;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+}
+
+#customer-type-selector input[type='radio'] {
+  display: none;
+}
+
+#customer-type-selector label {
+  position: relative;
+  color: var(--vt-c-indigo);
+  font-family: 'Roboto Mono', monospace;
+  font-size: 16px;
+  border: 2px solid var(--vt-c-indigo);
+  padding: 5px 20px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  justify-content: center;
+}
+
+#customer-type-selector > div:nth-child(1) > label {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+#customer-type-selector > div:nth-child(2) > label {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+#customer-type-selector label:before {
+  content: '';
+  height: 20px;
+  width: 20px;
+  border: 3px solid var(--vt-c-indigo);
+  border-radius: 50%;
+  margin-right: 15px;
+}
+
+#customer-type-selector input[type='radio']:checked + label {
+  background-color: var(--vt-c-indigo);
+  color: white;
+}
+
+#customer-type-selector input[type='radio']:checked + label:before {
+  height: 16px;
+  width: 16px;
+  border: 4px solid white;
+  background-color: var(--vt-c-indigo);
 }
 </style>
