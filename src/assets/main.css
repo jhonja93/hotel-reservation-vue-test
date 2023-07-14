@@ -107,6 +107,7 @@ button.search {
   flex: 1 1 auto;
   margin-left: 0px;
   align-items: center;
+  border: 2px solid var(--vt-c-indigo);
 }
 
 #dates-container label {

@@ -2,20 +2,40 @@
 import HOTELS from './../HOTELS.json'
 import { ref, computed } from 'vue'
 
+const hotels = ref(HOTELS)
 const startDate = ref('')
 const endDate = ref('')
 const customerType = ref('Regular')
+
 const minStartDate = computed(() => {
   const today = new Date()
   return today.toISOString().split('T')[0]
 })
 
 const minEndDate = computed(() => {
-  return startDate.value;
+  if (startDate.value) {
+    const minDate = new Date(startDate.value)
+    minDate.setDate(minDate.getDate() + 1)
+    return minDate.toISOString().split('T')[0]
+  } else {
+    return null
+  }
 })
 
 const disabledEndDate = computed(() => {
-  return startDate.value === '';
+  return startDate.value === ''
+})
+
+const numNights = computed(() => {
+  if (startDate.value && endDate.value) {
+    const start = new Date(startDate.value)
+    const end = new Date(endDate.value)
+    const timeDifference = Math.abs(end.getTime() - start.getTime())
+    const numDays = Math.ceil(timeDifference / (1000 * 3600 * 24)) // Calculate the number of days rounding up
+    return numDays - 1 // Subtract 1 to get the number of nights
+  } else {
+    return 0
+  }
 })
 
 const handleStartDate = () => {
@@ -23,14 +43,15 @@ const handleStartDate = () => {
 }
 
 const handleSubmit = () => {
-  const data = {
-    startDate: startDate.value,
-    endDate: endDate.value,
-    customerType: customerType.value,
-  }
-  console.log(data)
+  // const data = {
+  //   startDate: startDate.value,
+  //   endDate: endDate.value,
+  //   customerType: customerType.value,
+  // }
+  // hotels.value = hotels.filter(({weekday_regular_price, weekday_rewards_price, weekend_regular_price, weekend_rewards_price}) => {
+  //   if ()
+  // })
 }
-
 </script>
 
 <template>
@@ -40,12 +61,25 @@ const handleSubmit = () => {
         <div id="dates-container">
           <div>
             <label for="startDate">Check-in</label>
-            <input type="date" v-model="startDate" :min="minStartDate" @change="handleStartDate" />
+            <input
+              id="startDate"
+              type="date"
+              v-model="startDate"
+              :min="minStartDate"
+              @change="handleStartDate"
+            />
           </div>
           <div>
-            <label for="startDate">Check-out</label>
-            <input type="date" v-model="endDate" :disabled="disabledEndDate" :min="minEndDate" />
+            <label for="endDate">Check-out</label>
+            <input
+              id="endDate"
+              type="date"
+              v-model="endDate"
+              :disabled="disabledEndDate"
+              :min="minEndDate"
+            />
           </div>
+          <div>{{ numNights }} nights</div>
         </div>
         <div id="customer-type-selector">
           <div>
@@ -64,7 +98,7 @@ const handleSubmit = () => {
     </form>
     <hr style="opacity: 0.3" />
     <article class="hotels">
-      <section class="hotel__card" v-for="hotel in HOTELS" :key="hotel.id">
+      <section class="hotel__card" v-for="hotel in hotels" :key="hotel.id">
         <p class="hotel__card__title">{{ hotel.name }}</p>
         <div class="hotel__card__details">
           <!-- <span>Prices:</span> -->
