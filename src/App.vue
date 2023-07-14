@@ -26,13 +26,43 @@ const disabledEndDate = computed(() => {
   return startDate.value === ''
 })
 
+const handleDisabledSearchButton = computed(() => {
+  return startDate.value === '' || endDate.value === ''
+})
+
 const numNights = computed(() => {
   if (startDate.value && endDate.value) {
     const start = new Date(startDate.value)
     const end = new Date(endDate.value)
     const timeDifference = Math.abs(end.getTime() - start.getTime())
     const numDays = Math.ceil(timeDifference / (1000 * 3600 * 24)) // Calculate the number of days rounding up
-    return numDays - 1 // Subtract 1 to get the number of nights
+    return numDays;
+  } else {
+    return 0
+  }
+})
+
+const numWeekdayNights = computed(() => {
+  if (startDate.value && endDate.value) {
+    const start = new Date(startDate.value)
+    const end = new Date(endDate.value)
+    let weekdayCount = 0
+
+    for (let day = new Date(start); day <= end; day.setDate(day.getDate() + 1)) {
+      if (day.getDay() !== 0 && day.getDay() !== 5 && day.getDay() !== 6) {
+        weekdayCount++
+      }
+    }
+
+    return weekdayCount
+  } else {
+    return 0
+  }
+})
+
+const numWeekendNights = computed(() => {
+  if (startDate.value && endDate.value) {
+    return numNights.value - numWeekdayNights.value
   } else {
     return 0
   }
@@ -43,20 +73,41 @@ const handleStartDate = () => {
 }
 
 const handleSubmit = () => {
-  // const data = {
-  //   startDate: startDate.value,
-  //   endDate: endDate.value,
-  //   customerType: customerType.value,
-  // }
-  // hotels.value = hotels.filter(({weekday_regular_price, weekday_rewards_price, weekend_regular_price, weekend_rewards_price}) => {
-  //   if ()
-  // })
+  const data = {
+    startDate: startDate.value,
+    endDate: endDate.value,
+    customerType: customerType.value
+  }
+
+  hotels.value = hotels.value.sort((a, b) => {
+    const aTotal = calculateTotalPrice(a, data)
+    const bTotal = calculateTotalPrice(b, data)
+    return aTotal - bTotal
+  })
+}
+
+const calculateTotalPrice = (hotel, data) => {
+  const { customerType } = data
+  let totalPrice = 0
+
+  for (let i=0; i < numWeekdayNights.value; i++) {
+    totalPrice +=
+      customerType === 'Regular' ? hotel.weekday_regular_price : hotel.weekday_rewards_price
+  }
+
+  for (let i=0; i < numWeekendNights.value; i++) {
+    totalPrice +=
+      customerType === 'Regular' ? hotel.weekend_regular_price : hotel.weekend_rewards_price
+  }
+
+  console.log(hotel.name, totalPrice)
+  return totalPrice
 }
 </script>
 
 <template>
   <div class="container">
-    <form>
+    <form @submit.prevent="handleSubmit">
       <section class="search-input">
         <div id="dates-container">
           <div>
@@ -92,7 +143,9 @@ const handleSubmit = () => {
           </div>
         </div>
         <div>
-          <button class="search" type="submit" @submit.prevent="handleSubmit">Search</button>
+          <button class="search" type="submit" :disabled="handleDisabledSearchButton">
+            Search
+          </button>
         </div>
       </section>
     </form>
