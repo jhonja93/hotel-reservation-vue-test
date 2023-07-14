@@ -82,8 +82,15 @@ const handleSubmit = () => {
   hotels.value = hotels.value.sort((a, b) => {
     const aTotal = calculateTotalPrice(a, data)
     const bTotal = calculateTotalPrice(b, data)
-    return aTotal - bTotal
+    let res = aTotal - bTotal
+
+    if (res === 0) {
+      return b.rating - a.rating
+    }
+    return res
   })
+
+  hotels.value[0].showBestPriceTag = true
 }
 
 const calculateTotalPrice = (hotel, data) => {
@@ -100,7 +107,6 @@ const calculateTotalPrice = (hotel, data) => {
       customerType === 'Regular' ? hotel.weekend_regular_price : hotel.weekend_rewards_price
   }
 
-  console.log(hotel.name, totalPrice)
   return totalPrice
 }
 </script>
@@ -152,7 +158,7 @@ const calculateTotalPrice = (hotel, data) => {
     <hr style="opacity: 0.3" />
     <article class="hotels">
       <section class="hotel__card" v-for="hotel in hotels" :key="hotel.id">
-        <p class="hotel__card__title">{{ hotel.name }}</p>
+        <p class="hotel__card__title">{{ hotel.name }} <span id="best-price-tag" v-if="hotel.showBestPriceTag">Best Price</span></p>
         <div class="hotel__card__details">
           <!-- <span>Prices:</span> -->
           <span v-for="star in hotel.rating" :key="star">{{ '⭐️' }}</span>
